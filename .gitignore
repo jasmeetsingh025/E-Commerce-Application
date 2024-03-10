@@ -1,0 +1,7 @@
+.env
+node_modules
+.vscode
+uploads
+API-List.txt
+logs.txt
+.DS_Store
