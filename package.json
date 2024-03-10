@@ -21,6 +21,7 @@
     "swagger": "^0.7.5",
     "swagger-ui-express": "^5.0.0",
     "winston": "^3.11.0",
-    "cookie-parser": "^1.4.6"
+    "cookie-parser": "^1.4.6",
+    "bcrypt": "^5.1.1"
   }
 }
