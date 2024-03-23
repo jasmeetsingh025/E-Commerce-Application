@@ -6,20 +6,16 @@ class ProductController {
   constructor() {
     this.productRepository = new ProductRepository();
   }
-  async getAllProduct(req, res) {
+  async getAllProduct(req, res, next) {
     try {
       const products = await this.productRepository.getAllProduct();
       res.status(200).send(products);
     } catch (err) {
-      console.error(err);
-      throw new ApplicationError(
-        "Somthing went wrong in Product controller getAllProduct function",
-        500
-      );
+      next(err);
     }
   }
 
-  async addProduct(req, res) {
+  async addProduct(req, res, next) {
     try {
       const { name, desc, price, category, sizes } = req.body;
       const newProduct = {
@@ -34,31 +30,23 @@ class ProductController {
       await this.productRepository.addProduct(createdRecord);
       res.status(201).send(createdRecord);
     } catch (err) {
-      console.error(err);
-      throw new ApplicationError(
-        "Somthing went wrong in Product controller addProduct function",
-        500
-      );
+      next(err);
     }
   }
 
-  async rateProduct(req, res) {
+  async rateProduct(req, res, next) {
     try {
       const userID = req.cookies.userId;
-      const productId = req.query.productId;
-      const ratings = req.query.ratings;
+      const productId = req.body.productId;
+      const ratings = req.body.ratings;
       await this.productRepository.rateProduct(userID, productId, ratings);
       return res.status(200).send("product rating is set.");
     } catch (err) {
-      console.error(err);
-      throw new ApplicationError(
-        "Somthing went wrong in Product controller rateProduct function",
-        500
-      );
+      next(err);
     }
   }
 
-  async getOneProduct(req, res) {
+  async getOneProduct(req, res, next) {
     console.log(req);
     try {
       const id = req.params.id;
@@ -69,15 +57,11 @@ class ProductController {
         res.status(200).send(product);
       }
     } catch (err) {
-      console.error(err);
-      throw new ApplicationError(
-        "Somthing went wrong in Product controller getOneProduct function",
-        500
-      );
+      next(err);
     }
   }
 
-  async filterProduct(req, res) {
+  async filterProduct(req, res, next) {
     try {
       const minPrice = req.query.minPrice;
       const maxPrice = req.query.maxPrice;
@@ -89,11 +73,17 @@ class ProductController {
       );
       res.status(200).send(result);
     } catch (err) {
-      console.error(err);
-      throw new ApplicationError(
-        "Somthing went wrong in Product controller filterProduct function",
-        500
-      );
+      next(err);
+    }
+  }
+
+  async averagePrice(req, res, next) {
+    try {
+      const result =
+        await this.productRepository.averageProductPricePerCategory();
+      res.status(200).send(result);
+    } catch (err) {
+      next(err);
     }
   }
 }

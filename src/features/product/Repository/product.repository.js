@@ -55,11 +55,11 @@ class ProductRepository {
       const collection = getDb.collection(this.collection);
       await collection.updateOne(
         { _id: new ObjectId(productId) },
-        {
-          $addToSet: {
-            rating: { userID: new ObjectId(userId), rating: rating },
-          },
-        }
+        { $pull: { rating: { userID: new ObjectId(userId) } } }
+      );
+      await collection.updateOne(
+        { _id: new ObjectId(productId) },
+        { $addToSet: { rating: { userID: new ObjectId(userId), rating } } }
       );
     } catch (e) {
       console.error(e);
@@ -86,11 +86,48 @@ class ProductRepository {
       if (category) {
         filterExpressions.category = category;
       }
-      return await collection.find(filterExpressions).toArray();
+      return await collection
+        .find(filterExpressions)
+        .project({
+          name: 1,
+          price: 1,
+          _id: 0,
+          rating: { $slice: 2 },
+          size: 1,
+          category: 1,
+        })
+        .toArray();
     } catch (e) {
       console.error(e);
       throw new ApplicationError(
         "Somthing went wrong in Product Repository Filter Product function",
+        500
+      );
+    }
+  }
+  async averageProductPricePerCategory() {
+    try {
+      const getDb = getDB();
+      const collection = getDb.collection(this.collection);
+      return await collection
+        .aggregate([
+          {
+            $group: {
+              _id: "$category",
+              averagePrice: { $avg: "$price" },
+            },
+          },
+          {
+            $project: {
+              averagePrice: { $round: ["$averagePrice", 2] },
+            },
+          },
+        ])
+        .toArray();
+    } catch (e) {
+      console.error(e);
+      throw new ApplicationError(
+        "Somthing went wrong in Product Repository average product aggragate function",
         500
       );
     }

@@ -30,6 +30,7 @@ class MongoDB {
       .then((clientInstance) => {
         console.log("Connected successfully to server");
         client = clientInstance;
+        createIndex(client.db("EComm-Application"));
         //   const db = clientInstance.db("EComm-Application");
         //   const collection = db.collection("documents");
         //   return db;
@@ -42,6 +43,24 @@ class MongoDB {
   static getDB() {
     return client.db("EComm-Application");
   }
+
+  static getClient() {
+    return client;
+  }
 }
+
+const createIndex = async (db) => {
+  try {
+    await db.collection("products").createIndex({ price: 1 });
+    await db.collection("products").createIndex({ desc: "text" });
+    await db.collection("products").createIndex({ name: 1, category: -1 });
+  } catch (err) {
+    console.log(err);
+    throw new ApplicationError(
+      "Somthing went wrong in create Index function",
+      500
+    );
+  }
+};
 
 module.exports = MongoDB;

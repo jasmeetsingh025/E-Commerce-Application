@@ -1,14 +1,13 @@
 const UserModel = require("../model/user.model.js");
 const jwt = require("jsonwebtoken");
 const UserRepository = require("../Repository/user.repository.js");
-const ApplicationError = require("../../../Error handler/errorHandler.js");
 const bcrypt = require("bcrypt");
 
 class UserController {
   constructor() {
     this.userRepository = new UserRepository();
   }
-  async signUp(req, res) {
+  async signUp(req, res, next) {
     try {
       const { name, email, password, type } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -16,14 +15,10 @@ class UserController {
       await this.userRepository.signUp(newUser);
       res.status(201).send(newUser);
     } catch (err) {
-      console.log(err);
-      throw new ApplicationError(
-        "Somthing went wrong in User controller signUp function",
-        500
-      );
+      next(err);
     }
   }
-  async signIn(req, res) {
+  async signIn(req, res, next) {
     try {
       const user = await this.userRepository.findByEmail(req.body.email);
       if (!user) {
@@ -46,11 +41,7 @@ class UserController {
         }
       }
     } catch (e) {
-      console.error(e);
-      throw new ApplicationError(
-        "Somthing went wrong in User controller signIn function",
-        500
-      );
+      next(e);
     }
   }
 }

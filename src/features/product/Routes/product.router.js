@@ -14,6 +14,9 @@ router.route("/").get(authorization, (req, res) => {
 router.route("/filter").get((req, res) => {
   productController.filterProduct(req, res);
 });
+router.route("/average").get((req, res) => {
+  productController.averagePrice(req, res);
+});
 router.route("/:id").get((req, res) => {
   productController.getOneProduct(req, res);
 });

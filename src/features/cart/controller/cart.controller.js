@@ -1,32 +1,58 @@
-const cartModel = require("../model/cart.model.js");
+// const cartModel = require("../model/cart.model.js");
+const CartRepository = require("../Repository/cart.repository.js");
 
 class CartItemController {
-  add(req, res) {
-    const { productId, quantity } = req.query;
-    const userId = req.userId;
-    const result = cartModel.add(productId, userId, quantity);
-    if (!result) {
-      return res
-        .status(402)
-        .json({ success: false, msg: "product not added." });
+  constructor() {
+    this.cartRepository = new CartRepository();
+  }
+  async add(req, res, next) {
+    try {
+      const { productId, quantity } = req.body;
+      const userId = req.userId;
+      const result = await this.cartRepository.addCartItem(
+        productId,
+        userId,
+        quantity
+      );
+      if (!result) {
+        return res
+          .status(402)
+          .json({ success: false, msg: "product not added." });
+      }
+      // return res.status(201).json({ success: true, msg: result });
+      return res.status(200).send("product added");
+    } catch (e) {
+      next(e);
     }
-    return res.status(201).json({ success: true, msg: result });
   }
 
-  getItems(req, res) {
-    const userId = req.userId;
-    const item = cartModel.get(userId);
-    return res.status(200).json({ success: true, msg: item });
+  async getItems(req, res, next) {
+    try {
+      const userId = req.userId;
+      const item = await this.cartRepository.getCartItems(userId);
+      if (!item) {
+        res.status(404).json({ success: false, msg: "Item not found." });
+      }
+      return res.status(200).send(item);
+    } catch (e) {
+      next(e);
+    }
   }
 
-  delete(req, res) {
-    const userID = req.userId;
-    const cartItemId = req.params.id;
-    const error = cartModel.deleteCartItem(cartItemId, userID);
-    if (error) {
-      return res.status(404).send(error);
+  async delete(req, res, next) {
+    try {
+      const userID = req.userId;
+      const cartItemId = req.params.id;
+      const del = await this.cartRepository.deleteCartItem(cartItemId, userID);
+      if (!del) {
+        return res
+          .status(404)
+          .json({ success: false, msg: "Item not Deleted." });
+      }
+      res.status(200).send(del);
+    } catch (e) {
+      next(e);
     }
-    res.status(200).json({ success: true, msg: "cart item delete." });
   }
 }
 

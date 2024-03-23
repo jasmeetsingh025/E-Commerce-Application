@@ -10,6 +10,7 @@ const cors = require("cors");
 const productRouter = require("./src/features/product/Routes/product.router.js");
 const userRouter = require("./src/features/user/Routes/user.routes.js");
 const cartItems = require("./src/features/cart/routes/cart.route.js");
+const orderRouter = require("./src/features/order/routes/order.routes.js");
 const apiDocs = require("./swagger.json");
 const logCreation = require("./src/middleware/logger.middleware.js");
 const ApplicationError = require("./src/Error handler/errorHandler.js");
@@ -45,6 +46,7 @@ app.use(logCreation);
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/cartItems", cartItems);
+app.use("/api/orders", orderRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the server.");
