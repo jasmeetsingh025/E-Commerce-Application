@@ -5,14 +5,14 @@ const router = express.Router();
 
 const userController = new UserController();
 
-//# Get request for localhost/api/product
-router.post("/signin", (req, res) => {
-  userController.signIn(req, res);
+//# Post request for localhost/api/User
+router.route("/signin").post((req, res, next) => {
+  userController.signIn(req, res, next);
 });
-router.post("/signup", (req, res) => {
-  userController.signUp(req, res);
+router.route("/signup").post((req, res, next) => {
+  userController.signUp(req, res, next);
 });
-
-//# Post request
-
+router.route("/resetPassword").put((req, res, next) => {
+  userController.resetPassword(req, res, next);
+});
 module.exports = router;

@@ -1,32 +1,60 @@
-// const fs = require("fs");
 const winston = require("winston");
 
-// const fsPromise = fs.promises;
+const commonLogFormat = winston.format.combine(
+  winston.format.prettyPrint(),
+  winston.format.align(),
+  winston.format.timestamp({ format: "DD-MM-YYYY T hh:mm:ss A" }),
+  winston.format.printf(({ timestamp, level, message }) => {
+    return `${timestamp} ${level.toUpperCase()} - ${message}`;
+  })
+);
 
-// async function log(logData) {
-//   try {
-//     logData = `${new Date().toLocaleTimeString()} ${" Log data : - "} ${logData} \r\n`;
-//     await fsPromise.writeFile("log.txt", logData);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
+const commonLoggerConfig = {
+  level: "info",
+  format: commonLogFormat,
+  defaultMeta: { service: "request-loggin" },
+};
 
 const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.json(),
-  defaultMeta: { service: "request-loggin" },
-  transports: [new winston.transports.File({ filename: "logs.txt" })],
+  ...commonLoggerConfig,
+  transports: [
+    new winston.transports.File({
+      filename: "logs.txt",
+    }),
+  ],
 });
 
-const loggerMiddleware = async (req, res, next) => {
+const logError = winston.createLogger({
+  ...commonLoggerConfig,
+  level: "error",
+  transports: [
+    new winston.transports.File({
+      filename: "error_logs.txt",
+    }),
+  ],
+});
+
+const requestLoggerMiddleware = (req, res, next) => {
   if (!req.url.includes("signin")) {
-    const logData = `${new Date().toLocaleTimeString()} ${
-      req.url
-    } - ${JSON.stringify(req.body)}`;
-    // await log(logData);
+    let logData = `${req.url}`;
+    if (req.body && Object.keys(req.body).length > 0) {
+      logData += ` LOG: - ${JSON.stringify(req.body)}`;
+    } else {
+      logData += " LOG: - No data available in body";
+    }
     logger.info(logData);
   }
   next();
 };
-module.exports = loggerMiddleware;
+
+// Middleware to log errors
+const errorLoggerMiddleware = (err, req, res, next) => {
+  const logData = `Status Code: ${
+    err.code || err.statusCode || 500
+  }, Error Message: ${err.message},
+  Error Stack Trace: ${err.stack}`;
+  logError.error(logData);
+  next(err); // Pass the error to the next middleware (error handler)
+};
+
+module.exports = { errorLoggerMiddleware, requestLoggerMiddleware };

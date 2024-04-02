@@ -10,6 +10,13 @@ class UserController {
   async signUp(req, res, next) {
     try {
       const { name, email, password, type } = req.body;
+      if (!this.validatePassword(password)) {
+        return res
+          .status(400)
+          .send(
+            "Password must contain at least one number, one uppercase and one lowercase letter, and at least 8 or more characters"
+          );
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new UserModel(name, email, hashedPassword, type);
       await this.userRepository.signUp(newUser);
@@ -43,6 +50,31 @@ class UserController {
     } catch (e) {
       next(e);
     }
+  }
+
+  async resetPassword(req, res, next) {
+    try {
+      const { newPassword } = req.body;
+      if (!this.validatePassword(newPassword)) {
+        return res
+          .status(400)
+          .send(
+            "Password must contain at least one number, one uppercase and one lowercase letter, and at least 8 or more characters"
+          );
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const userID = req.cookies.userId;
+      await this.userRepository.resetPassword(userID, hashedPassword);
+      res.status(200).send("Password reset");
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  validatePassword(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+      password
+    );
   }
 }
 
