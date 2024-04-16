@@ -11,3 +11,5 @@ const CartSchema = new mongoose.Schema({
   },
   quantity: Number,
 });
+
+module.exports = CartSchema;
