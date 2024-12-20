@@ -19,6 +19,7 @@ const ProductSchema = new mongoose.Schema({
       ref: "Category",
     },
   ],
+  stock: Number,
 });
 
 module.exports = ProductSchema;

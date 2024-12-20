@@ -7,20 +7,19 @@ class CartItemController {
   }
   async add(req, res, next) {
     try {
-      const { productId, quantity } = req.body;
+      const { productId } = req.params;
+      const { quantity } = req.body;
       const userId = req.userId;
       const result = await this.cartRepository.addCartItem(
         productId,
         userId,
         quantity
       );
-      if (!result) {
-        return res
-          .status(402)
-          .json({ success: false, msg: "product not added." });
+      if (!result.success) {
+        return res.status(402).send(result);
       }
       // return res.status(201).json({ success: true, msg: result });
-      return res.status(200).send("product added");
+      return res.status(200).send(result);
     } catch (e) {
       next(e);
     }
@@ -39,17 +38,47 @@ class CartItemController {
     }
   }
 
+  async updateCart(req, res, next) {
+    try {
+      const { quantity } = req.body;
+      const userId = req.userId;
+      const cartItemId = req.params.cartId;
+      const result = await this.cartRepository.updateCartItem(
+        cartItemId,
+        userId,
+        quantity
+      );
+      if (!result.success) {
+        return res.status(404).send(result);
+      }
+      return res.status(200).send(result);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async delete(req, res, next) {
     try {
       const userID = req.userId;
-      const cartItemId = req.params.id;
+      const cartItemId = req.params.cartId;
       const del = await this.cartRepository.deleteCartItem(cartItemId, userID);
-      if (!del) {
-        return res
-          .status(404)
-          .json({ success: false, msg: "Item not Deleted." });
+      if (!del.success) {
+        return res.status(404).send(del);
       }
       res.status(200).send(del);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async clearItems(req, res, next) {
+    try {
+      const userId = req.userId;
+      const clear = await this.cartRepository.clearCartItems(userId);
+      if (!clear.success) {
+        return res.status(404).send(clear);
+      }
+      return res.status(200).send(clear);
     } catch (e) {
       next(e);
     }

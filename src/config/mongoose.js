@@ -21,12 +21,15 @@ class Mongoose {
     // Mark the method as async
     try {
       await mongoose.connect(`${process.env.DB_URL}/${process.env.DB_NAME}`, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+        // useNewUrlParser: true,
+        // useUnifiedTopology: true,
         // useCreateIndex: true,
         // useFindAndModify: false,
+        dbName: process.env.DB_NAME,
       });
-      console.log("Connected successfully to server using Mongoose");
+      console.log(
+        `Connected successfully to ${process.env.DB_NAME} server using Mongoose`
+      );
       await categories(); // Call the categories function after it's defined
     } catch (error) {
       console.error("Error connecting to MongoDB:", error);

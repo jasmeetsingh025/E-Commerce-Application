@@ -20,7 +20,14 @@ class UserController {
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new UserModel(name, email, hashedPassword, type);
       await this.userRepository.signUp(newUser);
-      res.status(201).send(newUser);
+
+      const userWithoutPassword = newUser;
+      delete userWithoutPassword.password;
+      res.status(201).json({
+        status: "success",
+        msg: "User Created Successfully",
+        result: userWithoutPassword,
+      });
     } catch (err) {
       next(err);
     }
@@ -29,11 +36,15 @@ class UserController {
     try {
       const user = await this.userRepository.findByEmail(req.body.email);
       if (!user) {
-        return res.status(400).send("Incorrect Email Address");
+        return res
+          .status(400)
+          .json({ status: "failed", msg: "Incorrect Email Address" });
       } else {
         const result = await bcrypt.compare(req.body.password, user.password);
         if (!result) {
-          return res.status(400).send("Incorrect Password");
+          return res
+            .status(400)
+            .json({ status: "failed", msg: "Incorrect Password" });
         } else {
           const token = jwt.sign(
             { userId: user._id, email: user.email },
@@ -47,8 +58,8 @@ class UserController {
             .json({ status: "success", msg: "login successfull", result });
         }
       }
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 

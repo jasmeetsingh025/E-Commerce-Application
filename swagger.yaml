@@ -1,0 +1,1442 @@
+openapi: 3.0.3
+info:
+  version: 1.3.1
+  description: API for E-Commerce Application
+  title: E-Commerce Application
+servers:
+  - url: http://localhost:3200/
+components:
+  securitySchemes:
+    JWT:
+      in: cookies
+      name: jwtToken
+      type: apiKey
+paths:
+  /api/users/signin:
+    post:
+      tags:
+        - 📢 Users
+      summary: Login
+      description: User login to get token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: jon@dow.com
+                password:
+                  type: string
+                  example: Password123!
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  msg:
+                    type: string
+                    example: Login successful
+                  result:
+                    type: string
+                    example: "true"
+        "400":
+          description: Incorrect Password or Incorrect Email Address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - failed
+                  msg:
+                    type: string
+                    example: Incorrect Password || Incorrect Email Address
+  /api/users/signup:
+    post:
+      tags:
+        - 📢 Users
+      summary: SignUp
+      description: Register a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Jon Dow
+                email:
+                  type: string
+                  example: jon@dow.com
+                password:
+                  type: string
+                  example: Password123!
+                type:
+                  type: string
+                  enum:
+                    - user
+                    - admin
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - success
+                  msg:
+                    type: string
+                    example: User Created Successfully
+                  result:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: Jon Dow
+                      email:
+                        type: string
+                        example: jon@dow.com
+                      type:
+                        type: string
+                        enum:
+                          - user
+                          - admin
+  /api/users/resetPassword:
+    patch:
+      tags:
+        - 📢 Users
+      summary: Reset Password
+      description: Reset the user's e-commerce profile password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: jon@dow.com
+                newPassword:
+                  type: string
+                  example: NewPassword123!
+      responses:
+        "200":
+          description: Password reset successfully
+        "400":
+          description: Password must contain at least one number, one uppercase and one lowercase letter, and at least 8 or more characters
+  /api/products/:
+    get:
+      tags:
+        - 📦 Products
+      summary: Get all products
+      description: This API returns all the products available in an e-commerce application. It includes details such as product name, description, price, stock, and other relevant information.
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 6755ccbebb44c514be5474cd
+                    name:
+                      type: string
+                      example: iPhone 12 Pro Max
+                    desc:
+                      type: string
+                      example: The latest iPhone 12 Pro Max with A15 Bionic chipset.
+                    price:
+                      type: number
+                      example: 1099.99
+                    imageUrl:
+                      type: string
+                      example: https://example.com/images/iphone12promax.jpg
+                    category:
+                      type: array
+                      items:
+                        type: string
+                      example: [Electronics, Mobile Phones]
+                    sizes:
+                      type: array
+                      items:
+                        type: string
+                      example: [6.5-inch, 5.8-inch]
+                    reviews:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                        ["Great camera quality", "Battery life is great."]
+                    categories:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                        [67534ebeb98345adc03060b4, 6755ccbebb44c514be5474d1]
+                    stock:
+                      type: number
+                      example: 1000
+    post:
+      tags:
+        - 📦 Products
+      summary: Create product
+      description: >-
+        The API enables an authenticated user with the role of `ADMIN` to create
+        a product by providing various details in the request body using form
+        data.
+
+
+        The required fields for creating a product includes:
+
+
+        - name
+
+        - description (desc)
+
+        - price
+
+        - imageUrl (image)
+
+        - category
+
+        - sizes
+
+        - reviews (Will be added by the user)
+
+        - categories (for related products will pick from pre-defined categories if not specified will be added at insertion time)
+
+        - stock
+
+        By submitting this information via form data, the API allows
+        administrators to efficiently add new products to the system, ensuring
+        accurate and comprehensive product listings for users.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: iPhone 12 Pro Max
+                desc:
+                  type: string
+                  example: The latest iPhone 12 Pro Max with A15 Bionic chipset.
+                price:
+                  type: number
+                  example: 1099.99
+                imageUrl:
+                  type: string
+                  example: https://example.com/images/iphone12promax.jpg
+                category:
+                  type: array
+                  items:
+                    type: string
+                    example: Mobile Phones, Electronics
+                sizes:
+                  type: array
+                  items:
+                    type: string
+                    example: 6.5-inch, 5.8-inch
+                reviews:
+                  type: string
+                  example: Great camera quality
+                categories:
+                  type: array
+                  items:
+                    type: string
+                    example: 67534ebeb98345adc03060b4, 6755ccbebb44c514be
+                stock:
+                  type: number
+                  example: 1000
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: iPhone 12 Pro Max
+                desc:
+                  type: string
+                  example: The latest iPhone 12 Pro Max with A15 Bionic chipset.
+                price:
+                  type: number
+                  example: 1099.99
+                imageUrl:
+                  type: string
+                  example: https://example.com/images/iphone12promax.jpg
+                category:
+                  type: array
+                  items:
+                    type: string
+                    example: Electronics, Mobile Phones
+                sizes:
+                  type: array
+                  items:
+                    type: string
+                    example: 6.5-inch, 5.8-inch
+                reviews:
+                  type: string
+                  example: Great camera quality
+                categories:
+                  type: array
+                  items:
+                    type: string
+                    example: 67534ebeb98345adc03060b4, 6755ccbebb44c514be
+                stock:
+                  type: number
+                  example: 1000
+      responses:
+        "201":
+          description: Products added successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                          - success
+                      msg:
+                        type: string
+                        example: Product added successfully!
+                      products:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: 6755ccbebb44c514be5474cd
+                            name:
+                              type: string
+                              example: iPhone 12 Pro Max
+                            desc:
+                              type: string
+                              example: The latest iPhone 12 Pro Max with A15 Bionic chipset.
+                            price:
+                              type: number
+                              example: 1099.99
+                            imageUrl:
+                              type: string
+                              example: https://example.com/images/iphone12promax.jpg
+                            category:
+                              type: array
+                              items:
+                                type: string
+                                example: Electronics, Mobile Phones
+                            sizes:
+                              type: array
+                              items:
+                                type: string
+                                example: 6.5-inch, 5.8-inch
+                            reviews:
+                              - type: string
+                                example: Great camera quality
+                              - type: string
+                                example: Battery life is great.
+                            categories:
+                              type: array
+                              items:
+                                type: string
+                                example: 67534ebeb98345adc03060b4, 6755ccbebb44c514be
+                            stock:
+                              type: number
+                              example: 10
+                            __v:
+                              type: number
+                              example: 0
+        "500":
+          description:
+            Internal Server Error: An unexpected error occurred while trying to add the product.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      statusCode:
+                        type: number
+                        example: 500
+                      msg:
+                        type: string
+                        example: An unexpected error occurred while trying to add the product.
+  /api/products/filter:
+    get:
+      tags:
+        - 📦 Products
+      summary: Filter products by category and price range
+      description: >-
+        The API enables an authenticated user to filter products based on their
+        category and price range using query parameters.
+
+        The supported query parameters include:
+
+        - category (string): The category of products to filter by.
+
+        - minPrice (number): The minimum price of products to filter by.
+
+        - maxPrice (number): The maximum price of producrs to filter by.
+        The response includes an array of matching products that meet the specified criteria.
+      parameters:
+        - name: category
+          in: query
+          description: Category of products to filter by.
+          required: false
+          schema:
+            type: string
+            example: Mobile Phones
+        - name: minPrice
+          in: query
+          description: Minimum price of products to filter by.
+          required: false
+          schema:
+            type: number
+            example: 500
+        - name: maxPrice
+          in: query
+          description: Maximum price of products to filter by.
+          required: false
+          schema:
+            type: number
+            example: 1500
+      responses:
+        "200":
+          description: Products filtered successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  msg:
+                    type: string
+                    example: Products filtered successfully!
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: iPhone 12 Pro Max
+                        desc:
+                          type: string
+                          example: The latest iPhone 12 Pro Max with A15 Bionic chipset.
+                        price:
+                          type: number
+                          example: 1099.99
+                        category:
+                          type: array
+                          items:
+                            type: string
+                            example: Mobile Phones
+                        sizes:
+                          type: array
+                          items:
+                            type: string
+                            example: 6.5-inch, 5.8-inch
+  /api/products/average:
+    get:
+      tags:
+        - 📦 Products
+      summary: Calculate the average price of products in a given category
+      description: >-
+        The API enables an authenticated user to calculate the average price of products
+        in a specified category.
+      responses:
+        "200":
+          description: Average price of products in the specified category calculated successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  res:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        categoryName:
+                          type: string
+                          example: Mobile Phones
+                        averagePrice:
+                          type: integer
+                          example: 1099
+  /api/products/{id}:
+    get:
+      tags:
+        - 📦 Products
+      summary: Get product by ID
+      description: >-
+        The API enables an authenticated user to retrieve a specific product by its ID.
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the product to retrieve.
+          required: true
+          schema:
+            type: string
+            example: 6755ccbebb44c514be5474cd
+      responses:
+        "200":
+          description: Product retrieved successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: boolean
+                        example: true
+                      msg:
+                        type: string
+                        example: Product retrieved successfully!
+                      product:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                            example: 6755ccbebb44c514be5474cd
+                          name:
+                            type: string
+                            example: iPhone 12 Pro Max
+                          desc:
+                            type: string
+                            example: The latest iPhone 12 Pro Max with A15 Bionic chipset.
+                          price:
+                            type: number
+                            example: 1099.99
+                          imageUrl:
+                            type: string
+                            example: https://example.com/images/iphone12promax.jpg
+                          category:
+                            type: array
+                            items:
+                              type: string
+                              example: Electronics, Mobile Phones
+                          sizes:
+                            type: array
+                            items:
+                              type: string
+                              example: 6.5-inch, 5.8-inch
+                          reviews:
+                            type: array
+                            items:
+                              - type: string
+                                example: Great camera quality
+                              - type: string
+                                example: Battery life is great.
+                          categories:
+                            type: array
+                            items:
+                              type: string
+                              example: 67534ebeb98345adc03060b4, 6755ccbebb44c514be
+                          stock:
+                            type: number
+                            example: 10
+                          __v:
+                            type: number
+                            example: 0
+    patch:
+      tags:
+        - 📦 Products
+      summary: Update product
+      description: >-
+        The API enables an authenticated user with the role of `ADMIN` to update
+        a product's information.
+
+
+        By passing the `productId` as a path variable, the API allows the user
+        to modify the product's attributes such as name, description, price,
+        stock, category (referenced by categoryId), mainImage (the primary
+        image)
+
+        All of these fields can be included in the request body as form data,
+        and they are optional, meaning that only the provided fields will be
+        updated.
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the product to update.
+          required: true
+          schema:
+            type: String
+            example: 6755ccbebb44c514be5474cd
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: iPhone 12 Pro Max updated
+                desc:
+                  type: string
+                  example: The latest iPhone 12 Pro Max with A15 Bionic chipset updated
+                price:
+                  type: number
+                  example: 1199.99
+                imageUrl:
+                  type: string
+                  example: https://example.com/images/iphone12promaxupdated.jpg
+                category:
+                  type: array
+                  items:
+                    type: string
+                    example: Electronics, Mobile Phones
+                sizes:
+                  type: array
+                  items:
+                    type: string
+                    example: 6.5-inch, 5.8-inch
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: iPhone 12 Pro Max updated
+                desc:
+                  type: string
+                  example: The latest iPhone 12 Pro Max with A15 Bionic chipset updated
+                price:
+                  type: number
+                  example: 1199.99
+                imageUrl:
+                  type: string
+                  example: https://example.com/images/iphone12promaxupdated.jpg
+                category:
+                  type: array
+                  items:
+                    type: string
+                    example: Electronics, Mobile Phones
+                sizes:
+                  type: array
+                  items:
+                    type: string
+                    example: 6.5-inch, 5.8-inch
+      responses:
+        "200":
+          description: update product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  msg:
+                    type: string
+                    example: Product updated successfully!
+                  product:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 6755ccbebb44c514be5474cd
+                      name:
+                        type: string
+                        example: iPhone 12 Pro Max updated
+                      desc:
+                        type: string
+                        example: The latest iPhone 12 Pro Max with A15 Bionic chipset updated
+                      price:
+                        type: number
+                        example: 1199.99
+                      imageUrl:
+                        type: string
+                        example: https://example.com/images/iphone12promaxupdated.jpg
+                      category:
+                        type: array
+                        items:
+                          type: string
+                          example: Electronics, Mobile Phones
+                      sizes:
+                        type: array
+                        items:
+                          type: string
+                          example: 6.5-inch, 5.8-inch
+                      reviews:
+                        type: array
+                        items:
+                          - type: string
+                            example: Great camera quality
+                          - type: string
+                            example: Battery life is great.
+                      categories:
+                        type: array
+                        items:
+                          type: string
+                          example: 67534ebeb98345adc03060b4, 6755ccbebb44c514be
+                      stock:
+                        type: number
+                        example: 10
+                      __v:
+                        type: number
+                        example: 0
+    delete:
+      tags:
+        - 📦 Products
+      summary: Delete product
+      description: >-
+        The API enables an authenticated user with the role of `ADMIN` to delete
+        a product.
+
+        The `productId` is required as a path variable.
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the product to delete.
+          required: true
+          schema:
+            type: string
+            example: 6755ccbebb44c514be5474cd
+      responses:
+        "200":
+          description: delete product sucessfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  msg:
+                    type: string
+                    example: Product deleted successfully!
+        "404":
+          description: Couldn't delete product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: Couldn't delete product. The product was not found.
+  /api/products/rate:
+    post:
+      tags:
+        - 📦 Products
+      summary: Rate products
+      description: >-
+        The API enables an authenticated user to rate a product. The user's rating
+        is associated with their JWT token.
+
+        The request body should include the `rating` (1-5)
+        as form data.
+        The `productId` is required as a path variable.
+
+        If the user has already rated the product, their new rating will be
+        updated. Otherwise, a new rating will be created.
+      parameters:
+        - in: cookie
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: The user ID retrieved from the cookie.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  example: 5
+                productId:
+                  type: string
+                  example: 6755ccbebb44c514be5474cd
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  example: 5
+                productId:
+                  type: string
+                  example: 6755ccbebb44c514be5474cd
+      responses:
+        "200":
+          description: Product rating set successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  msg:
+                    type: string
+                    example: Rating set successfully!
+                  rating:
+                    type: integer
+                    example: 5
+                  __v:
+                    type: number
+                    example: 0
+        "404":
+          description: Error faced while processing products rating
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Product was not found
+                  statusCode:
+                    type: integer
+                    example: 404
+  /api/cartItems:
+    get:
+      tags:
+        - 🛒 Cart
+      summary: Get user cart items
+      description: >-
+        The API endpoint returns the cart of the logged-in user.
+
+
+        This API allows authenticated users to retrieve the contents of their
+        shopping cart.
+
+
+        The response typically includes information about the products or items
+        added to the cart, such as their names, quantities, prices, and any
+        relevant details.
+
+
+        This endpoint ensures that only authorized users can access and view
+        their own cart data.
+      responses:
+        "200":
+          description: Get the user's cart items.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Cart items retrieved successfully.
+                  cartItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 6755ccbebb44c514be5474cd
+                        productId:
+                          type: string
+                          example: 6755ccbebb44c514be5474cd
+                        name:
+                          type: string
+                          example: Sony TV 8K
+                        price:
+                          type: number
+                          example: 1299.99
+                        quantity:
+                          type: integer
+                          example: 2
+                        total:
+                          type: number
+                          example: 2599.98
+                        __v:
+                          type: number
+  /api/cartItems/{productId}:
+    post:
+      tags:
+        - 🛒 Cart
+      summary: Add product to cart
+      description: >-
+        The API endpoint allows authenticated users to add products to their
+        shopping cart.
+
+        The frontend can send a request to this API, passing the `productId` as
+        a path variable and the desired `quantity` as a number in the request
+        body.
+      parameters:
+        - in: path
+          name: productId
+          description: The unique identifier of the product to add to the cart.
+          required: true
+          schema:
+            type: string
+            example: 6755ccbebb44c514be5474cd
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  example: 2
+      responses:
+        "200":
+          description: Add Item quantity to the cart.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Product added to cart successfully.
+        "402":
+          description: Some things went wrong
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Somthing went wrong in Cart Repository Add Cart Item function OR
+  /api/cartItems/{cartId}:
+    patch:
+      tags:
+        - 🛒 Cart
+      summary: Update product quantity in cart
+      description: >-
+        The API endpoint allows authenticated users to update the quantity of
+        products in their shopping cart.
+
+        The frontend can send a request to this API, passing the `cartId` as
+        a path variable and the updated `quantity` as a number in the request
+        body.
+      parameters:
+        - in: path
+          name: cartId
+          description: The unique identifier of the cart.
+          required: true
+          schema:
+            type: string
+            example: 6755ccbebb44c514be5474cd
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  example: 2
+      responses:
+        "200":
+          description: The cart was successfully updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Cart item updated successfully
+                  cartItems:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 6755ccbebb44c514be5474cd
+                      productId:
+                        type: string
+                        example: 6755ccbebb44c514be5474cd
+                      userId:
+                        type: string
+                        example: 6755ccbebb44c514be5474cd
+                      quantity:
+                        type: integer
+                        example: 2
+                      __v:
+                        type: integer
+                        example: 0
+        "404":
+          description: Cart not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Cart item not found or does not belong to the user
+    delete:
+      tags:
+        - 🛒 Cart
+      summary: Remove product from cart
+      description: >-
+        The API endpoint allows authenticated users to remove products from
+        their shopping cart.
+  /api/cartItems/clear:
+    delete:
+      tags:
+        - 🛒 Cart
+      summary: Clear Cart
+      description: >-
+        The API endpoint allows a logged-in user to clear their entire shopping
+          cart.
+
+
+          By invoking this API, the user can remove all items from their cart,
+          effectively clearing it and starting afresh.
+
+
+          This feature provides a convenient way for users to manage their
+          shopping carts and begin a new shopping session.
+      responses:
+        "200":
+          description: Cart cleared successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Cart cleared successfully.
+        "404":
+          description: >-
+            Error faced while processing cart clearance. The user may not
+            have a cart or may not be authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Cart not found or does not belong to the user
+  /api/orders/:
+    post:
+      tags:
+        - 📥 Order
+      summary: Create new order
+      description: >-
+        The API endpoint allows authenticated users to create new orders from
+        their shopping cart.
+
+        After adding products to the cart, the user can submit a request to
+        this API to create a new order. The order details will be sent to the
+        backend for processing and storage.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  description: "The unique identifier of the user placing the order."
+                  example: "12345"
+      responses:
+        "200":
+          description: Order created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Order created successfully.
+                  orderId:
+                    type: string
+                    example: "6755ccbebb44c514be5474cd"
+        "400":
+          description: Invalid user ID or request data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Invalid user ID or request data.
+  /api/orders/{orderId}:
+    get:
+      tags:
+        - 📥 Order
+      summary: Retrieve order by ID
+      description: >-
+        The API allows users to retrieve information about an order placed by a
+        user by specifying the `orderId` as a path variable.
+
+
+        This can be used to get complete details of the order for admin or user
+        who has placed the order.
+      parameters:
+        - in: path
+          name: orderId
+          description: The unique identifier of the order to retrieve.
+          required: true
+          schema:
+            type: string
+            example: "6755ccbebb44c514be5474cd"
+      responses:
+        "200":
+          description: Order retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Order retrieved successfully.
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "6755ccbebb44c514be5474cd"
+                      order:
+                        type: object
+                        properties:
+                          __v:
+                            type: number
+                            example: 0
+                          _id:
+                            type: string
+                            example: "6755ccbebb44c514be5474cd"
+                          address:
+                            type: object
+                            properties:
+                              __v:
+                                type: number
+                                example: 0
+                              _id:
+                                type: string
+                                example: "6755ccbebb44c514be5474cd"
+                              addressLine1:
+                                type: string
+                                example: "123 Main St"
+                              addressLine2:
+                                type: string
+                                example: "Apt 4B"
+                              city:
+                                type: string
+                                example: "New York"
+                              country:
+                                type: string
+                                example: "U.S.A"
+                              createdAt:
+                                type: string
+                                example: "2022-06-23T14:30:45.789Z"
+                              owner:
+                                type: string
+                                example: "6755ccbebb44c514be5474cd"
+                              pincode:
+                                type: string
+                                example: "10001"
+                              state:
+                                type: string
+                                example: "NY"
+                              updatedAt:
+                                type: string
+                                example: "2022-06-23T14:30:45.789Z"
+                          createdAt:
+                            type: string
+                            example: "2022-06-23T14:30:45.789Z"
+                          customer:
+                            type: object
+                            properties:
+                              _id:
+                                type: string
+                                example: "6755ccbebb44c514be5474cd"
+                              email:
+                                type: string
+                                example: "john.doe@example.com"
+                              name:
+                                type: string
+                                example: "John Doe"
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                _id:
+                                  type: string
+                                  example: "6755ccbebb44c514be5474cd"
+                                product:
+                                  type: object
+                                  properties:
+                                    __v:
+                                      type: number
+                                      example: 0
+                                    _id:
+                                      type: string
+                                      example: "6755ccbebb44c514be5474cd"
+                                    category:
+                                      type: string
+                                      example: "6755ccbebb44c514be5474cd"
+                                    createdAt:
+                                      type: string
+                                      example: "2022-06-23T14:30:45.789Z"
+                                    description:
+                                      type: string
+                                      example: >-
+                                        Carbonite web goalkeeper gloves are
+                                        ergonomically designed to give easy fit
+                                name:
+                                  type: string
+                                  example: "Carbonite Goalkeeper Gloves"
+                                price:
+                                  type: number
+                                  example: 199.99
+                                stock:
+                                  type: number
+                                  example: 100
+  /api/orders/list/admin:
+    get:
+      tags:
+        - 📥 Order
+      summary: Returns a list of all orders that have been created
+      description: >-
+        The API endpoint allows administrators to retrieve a list of all orders
+        that have been created, including details like order ID, customer, and quantity
+      parameters:
+        - in: query
+          name: page
+          description: The page number of the results. Default is 1.
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - in: query
+          name: limit
+          description: The maximum number of results per page. Default is 10.
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - in: query
+          name: status
+          description: The status of the orders to filter by. Valid values are "Pending", "Delivered", "Cancelled".
+          required: true
+          schema:
+            type: string
+            example: "Pending"
+      responses:
+        "200":
+          description: The order was successfully filtered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Orders retrieved successfully.
+                  result:
+                    type: object
+                    properties:
+                      orders:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: integer
+                              example: 6755ccbebb44c514be5474cd
+                            status:
+                              type: string
+                              example: "Pending"
+                            customer:
+                              type: object
+                              properties:
+                                _id:
+                                  type: string
+                                  example: "6755ccbebb44c514be5474cd"
+                                username:
+                                  type: string
+                                  example: "john.doe"
+                                email:
+                                  type: string
+                                  example: "john.doe@example.com"
+                            totalOrderItems:
+                              type: integer
+                              example: 2
+                      totalOrders:
+                        type: integer
+                        example: 10
+                      limit:
+                        type: integer
+                        example: 2
+                      page:
+                        type: integer
+                        example: 1
+                      totalPages:
+                        type: integer
+                        example: 5
+  /api/orders/status/{orderId}:
+    patch:
+      tags:
+        - 📥 Order
+      summary: Updates the status of an order
+      description: >-
+        The API endpoint allows administrators to update the status of a specific order.
+      parameters:
+        - in: path
+        - name: orderId
+          description: The unique identifier of the order.
+          required: true
+          schema:
+            type: integer
+            example: 6755ccbebb44c514be5474cd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "success"
+      responses:
+        "200":
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Order status updated successfully.
+                  result:
+                    type: object
+                    properties:
+                      _id:
+                        type: integer
+                        example: 6755ccbebb44c514be5474cd
+                      orderprice:
+                        type: integer
+                        example: 199.99
+                      customer:
+                        type: string
+                        example: 6755ccbebb44c514be5474cd
+                      items:
+                        type: object
+                        properties:
+                          types:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                productId:
+                                  type: string
+                                  example: "6755ccbebb44c514be5474cd"
+                                quantity:
+                                  type: integer
+                                  example: 2
+                      addresses:
+                        type: object
+                        properties:
+                          addressLine1:
+                            type: string
+                            example: 123 Main St
+                          addressLine2:
+                            type: string
+                            example: Apt. 4B
+                          city:
+                            type: string
+                            example: Anytown
+                          state:
+                            type: string
+                            example: CA
+                          country:
+                            type: string
+                            example: USA
+                          pincode:
+                            type: string
+                            example: 12345
+                      status:
+                        type: string
+                        example: "Delivered"

@@ -21,12 +21,22 @@ router.route("/:id").get((req, res, next) => {
   productController.getOneProduct(req, res, next);
 });
 
+//# patch product
+router.patch("/:id", upload.single("imageUrl"), (req, res, next) => {
+  productController.updateProduct(req, res, next);
+});
+
 //# Post request
 router.post("/", upload.single("imageUrl"), (req, res, next) => {
   productController.addProduct(req, res, next);
 });
 router.route("/rate").post((req, res, next) => {
   productController.rateProduct(req, res, next);
+});
+
+//# Delete request
+router.delete("/:id", authorization, (req, res, next) => {
+  productController.deleteProduct(req, res, next);
 });
 
 module.exports = router;

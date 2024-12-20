@@ -34,7 +34,7 @@ class UserRepository {
     try {
       return await UserModel.findOne({ email });
     } catch (err) {
-      console.error(e);
+      console.error(err);
       throw new ApplicationError(
         "Somthing went wrong in User Repository FindByEmail function",
         500

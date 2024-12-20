@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: {
-      values: ["Seller", "Customer"],
+      values: ["ADMIN", "Seller", "Customer"],
       required: true,
       message: "{VALUE} is not supported",
     },
