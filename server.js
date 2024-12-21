@@ -28,10 +28,11 @@ const ApplicationError = require("./src/Error handler/errorHandler.js");
 const { connectToMongodbUsingMongoose } = require("./src/config/mongoose.js");
 const file = fs.readFileSync(path.resolve(__dirname, "./swagger.yaml"), "utf8");
 const swaggerDocument = YAML.parse(file);
-console.log(process.env.PORT);
 swaggerDocument.servers = [
   {
-    url: process.env.PORT || "http://localhost:3200/api-docs",
+    url: `http://${process.env.HOST || "localhost"}:${
+      process.env.PORT || 8080
+    }`,
     description: "Development server",
   },
 ];
@@ -124,11 +125,10 @@ app.use(errorLoggerMiddleware, appLevelErrorHandlerMiddleware);
 //   res.status(404).send("API not found");
 // });
 app.listen(process.env.PORT || 8080, () => {
-  console.log(
-    `📑 Visit the documentation at: http://localhost:${
-      process.env.PORT || 8080
-    }`
-  );
-  // connectToMongodb();
+  const port = process.env.PORT || 8080;
+  const host = process.env.HOST || "localhost"; // Use HOST if set, otherwise default to localhost
+  console.log(`📑 Visit the documentation at: http://${host}:${port}`);
+
+  // Connect to MongoDB
   connectToMongodbUsingMongoose();
 });
