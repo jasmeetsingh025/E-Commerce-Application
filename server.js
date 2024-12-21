@@ -28,10 +28,10 @@ const ApplicationError = require("./src/Error handler/errorHandler.js");
 const { connectToMongodbUsingMongoose } = require("./src/config/mongoose.js");
 const file = fs.readFileSync(path.resolve(__dirname, "./swagger.yaml"), "utf8");
 const swaggerDocument = YAML.parse(file);
-console.log(process.env.SWAGGER_SERVER_URL);
+console.log(process.env.PORT);
 swaggerDocument.servers = [
   {
-    url: process.env.SWAGGER_SERVER_URL || "http://localhost:3200/api-docs",
+    url: process.env.PORT || "http://localhost:3200/api-docs",
     description: "Development server",
   },
 ];
