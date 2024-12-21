@@ -121,8 +121,12 @@ app.use(errorLoggerMiddleware, appLevelErrorHandlerMiddleware);
 // app.use((req, res) => {
 //   res.status(404).send("API not found");
 // });
-app.listen(3200, () => {
-  console.log("Listening to the server 3200.");
+app.listen(process.env.PORT || 8080, () => {
+  console.log(
+    `📑 Visit the documentation at: http://localhost:${
+      process.env.PORT || 8080
+    }`
+  );
   // connectToMongodb();
   connectToMongodbUsingMongoose();
 });
