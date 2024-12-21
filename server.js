@@ -27,12 +27,14 @@ const ApplicationError = require("./src/Error handler/errorHandler.js");
 // const { connectToMongodb } = require("./src/config/mongodb.js");
 const { connectToMongodbUsingMongoose } = require("./src/config/mongoose.js");
 const file = fs.readFileSync(path.resolve(__dirname, "./swagger.yaml"), "utf8");
-const swaggerDocument = YAML.parse(
-  file.replace(
-    "- url: ${{server}}",
-    `- url: ${process.env.FREEAPI_HOST_URL || "http://localhost:3200"}/api-docs`
-  )
-);
+const swaggerDocument = YAML.parse(file);
+console.log(process.env.SWAGGER_SERVER_URL);
+swaggerDocument.servers = [
+  {
+    url: process.env.SWAGGER_SERVER_URL || "http://localhost:3200/api-docs",
+    description: "Development server",
+  },
+];
 
 const app = new express();
 
