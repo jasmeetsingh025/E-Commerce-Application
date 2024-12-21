@@ -32,7 +32,7 @@ swaggerDocument.servers = [
   {
     url:
       process.env.NODE_ENV === "production"
-        ? `https://${process.env.RENDER_URL || window.location.hostname}` // Render URL or automatic detection
+        ? `https://${process.env.RENDER_URL}` // Render URL or automatic detection
         : `http://${process.env.HOST || "localhost"}:${
             process.env.PORT || 8080
           }`,
