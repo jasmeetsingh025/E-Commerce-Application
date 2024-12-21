@@ -30,10 +30,13 @@ const file = fs.readFileSync(path.resolve(__dirname, "./swagger.yaml"), "utf8");
 const swaggerDocument = YAML.parse(file);
 swaggerDocument.servers = [
   {
-    url: `http://${process.env.HOST || "localhost"}:${
-      process.env.PORT || 8080
-    }`,
-    description: "Development server",
+    url:
+      process.env.NODE_ENV === "production"
+        ? `https://${process.env.RENDER_URL || window.location.hostname}` // Render URL or automatic detection
+        : `http://${process.env.HOST || "localhost"}:${
+            process.env.PORT || 8080
+          }`,
+    description: "API Documentation",
   },
 ];
 
@@ -61,10 +64,12 @@ const app = new express();
 app.use(
   cors({
     origin:
-      process.env.CORS_ORIGIN === "*"
-        ? "*"
-        : process.env.CORS_ORIGIN?.split(","),
-    credentials: true, //* allow session cookiess
+      process.env.NODE_ENV === "production"
+        ? `https://${process.env.RENDER_URL}` // Use Render's dynamic production URL
+        : process.env.CORS_ORIGIN === "*"
+        ? "*" // Allow all origins if CORS_ORIGIN is '*'
+        : process.env.CORS_ORIGIN?.split(","), // Split CORS_ORIGIN by commas for multiple allowed origins
+    credentials: true, // Allow cookies and credentials to be sent
   })
 );
 
